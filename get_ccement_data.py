@@ -57,19 +57,9 @@ def data_parser(parser_data,province_name,data_range_week):
     f.write(record_close+'\n')
     f.close
 
-#def getCementPriceByProvince(ProvinceId):
-#    print('省份ID : '+ProvinceId)
-#    url = 'https://data.ccement.com/area/price/'+ProvinceId+'.html' #水泥價格 
-#    print('Download : '+url)
-#    op = opener.open(url)  
-#    data = op.read()  
-#    data = ungzip(data)  
-#    return data
 
 def main():  
     #封裝頭信息，偽裝成瀏覽器  
-    global opener
-    global op
     header = {  
         'Connection': 'Keep-Alive',  
         'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',  
@@ -80,12 +70,12 @@ def main():
         'Host': 'i.ccement.com',  
     }  
   
-  
+    #登入的頁面
     url = 'http://i.ccement.com/Ajax/loginHandler.ashx?reUrl=http://data.ccement.com/area/price/provincelist.html'  
     opener = getOpener(header)  
     
-    id = 'usre'#你的用户名  
-    password = 'pwd'#你的密碼  
+    id = ''#你的用户名  
+    password = ''#你的密碼  
     postDict = {  
             'act':'',
             'txtUserName': id,  
@@ -99,37 +89,27 @@ def main():
     data = op.read()  
     data = ungzip(data)  
     print(data)
-
     data_range_week=52 #要抓取的資料週數(由今天往前推幾週)
- ## Open file
+
+    ## 讀取要抓的省份清單file
     province_data = open('ccement_list.csv', "r")
     lines = province_data.readlines()
     province_data.close()
-    for i in range(len(lines)):
+    for i in range(len(lines)): #依序將list中的省份資料抓出
         Provincename=lines[i].split(',')[0]
         ProvinceId=lines[i].split(',')[1].strip('\n')
         print ('Provincename :'+Provincename)
         print ('ProvinceId :'+ProvinceId)
-        #ProvinceId='410000'
-        #print('省份ID : '+ProvinceId)
-        #url = 'https://data.ccement.com/area/price/410000.html' #水泥價格 
         url = 'https://data.ccement.com/area/price/'+ProvinceId+'.html' #水泥價格 
         print('Download URL:'+url)
         op = opener.open(url)  
         data = op.read()  
         data = ungzip(data)  
-        #data=getCementPriceByProvince('410000')
         parser_data = data.decode('utf-8')
-        #Provincename='河南'
         data_parser(parser_data,Provincename,data_range_week)
-        time.sleep(3
-        )
+        time.sleep(3) #間格3秒抓一個省份
 
-
-
-
-    
-    opener.close
+    opener.close #關閉連線
 
 
 if __name__ == "__main__":
